@@ -36,3 +36,17 @@
     transform: rotate(360deg);
   }
 }
+
+header {
+  position: fixed;
+}
+
+footer {
+  text-align: center;
+}
+
+main {
+  flex: 1;
+  padding-top: 5rem;
+  min-height: 95vh;
+}

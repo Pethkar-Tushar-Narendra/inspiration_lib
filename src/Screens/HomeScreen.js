@@ -1,7 +1,15 @@
 import React from 'react';
 
 function HomeScreen() {
-  return <h1>HomeScreen HomeScreen</h1>;
+  var date = new Date();
+  var CurrentDate = date.getMonth();
+
+  return (
+    <h1>
+      HomeScreen HomeScreen{'  '}
+      {CurrentDate}
+    </h1>
+  );
 }
 
 export default HomeScreen;

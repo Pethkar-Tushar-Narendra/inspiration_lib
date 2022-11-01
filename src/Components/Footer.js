@@ -3,7 +3,7 @@ import { Container, Navbar } from 'react-bootstrap';
 
 function Footer() {
   return (
-    <Navbar bg="primary" variant="dark">
+    <Navbar bg="primary" variant="dark" expand="lg" fixed="bottom">
       <Container>
         <div style={{ textAlign: 'center' }}>
           <h6>Footer 2022 copyright</h6>

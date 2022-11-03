@@ -9,7 +9,7 @@ import LoginScreen from './Screens/LoginScreen';
 import ProfileScreen from './Screens/ProfileScreen';
 import SubscriptionScreen from './Screens/SubscriptionScreen';
 import ChatBox from './Components/ChatBox';
-import RegistrationScreen from './Screens/RegistrationScreen';
+// import RegistrationScreen from './Screens/RegistrationScreen';
 import AdminChatScreen from './Screens/AdminChatScreen';
 import TodolistScreen from './Screens/TodolistScreen';
 import AdminDashboardScree from './Screens/AdminDashboardScree';
@@ -29,7 +29,6 @@ function App() {
               <Route path="/login" element={<LoginScreen />} />
               <Route path="/profile" element={<ProfileScreen />} />
               <Route path="/subscription" element={<SubscriptionScreen />} />
-              <Route path="/registration" element={<RegistrationScreen />} />
               <Route path="/todolist" element={<TodolistScreen />} />
               <Route path="/dashboard" element={<AdminDashboardScree />} />
               <Route path="/userlist" element={<AdminUserList />} />

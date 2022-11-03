@@ -1,14 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Spinner,
+} from 'reactstrap';
+import MessageToggle from '../Components/models/MessageToggle';
+import RegisterToggle from '../Components/models/RegisterToggle';
 
 function HomeScreen() {
-  var date = new Date();
-  var CurrentDate = date.getMonth();
-
+  const [modal, setModal] = useState(false);
+  const toggle = () => setModal(!modal);
   return (
-    <h1>
-      HomeScreen HomeScreen{'  '}
-      {CurrentDate}
-    </h1>
+    <div>
+      <Button color="danger" onClick={toggle}>
+        Click Me
+      </Button>
+      <MessageToggle modal={modal} toggle={toggle} />
+    </div>
   );
 }
 

@@ -1,16 +1,15 @@
 import React, { useEffect, useReducer, useState } from 'react';
 import axios from 'axios';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import LoadingBox from '../Components/LoadingBox';
 import MessageBox from '../Components/MessageBox';
 import { Button } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { Col, Row } from 'reactstrap';
+import UserEditToggle from '../Components/models/UserEditToggle';
 
 const reducer = (state, action) => {
   switch (action.type) {
     case 'Request_fetch':
-      return { ...state, loading: false };
+      return { ...state, loading: true };
     case 'Fetch_fail': {
       return { ...state, loading: false, error: action.payload };
     }
@@ -24,7 +23,6 @@ const reducer = (state, action) => {
 };
 
 function AdminUserList() {
-  const navigate = useNavigate();
   const [{ loading, error, users }, dispatch] = useReducer(reducer, {
     loading: true,
     error: '',
@@ -43,44 +41,26 @@ function AdminUserList() {
     };
     fetchData();
   }, []);
-  var date = new Date();
-  var CurrentDate = date.getMonth();
-  var dt = date.toDateString();
-
-  const [selectedDate, setSelectedDate] = useState(null);
-  var users1 = new Array();
-  const filterHandler = () => {
-    users
-      .filter((user, i) => {
-        return i <= 1;
-      })
-      .forEach((user, i) => {
-        users1.push(user);
-      });
-    console.log(users1);
-  };
-
+  const [user, setUser] = useState([]);
+  const [modal, setModal] = useState(false);
+  const toggle = () => setModal(!modal);
   return (
     <>
-      <h1>Registered Users</h1>
-      {loading ? (
-        <LoadingBox></LoadingBox>
-      ) : error ? (
+      <Row>
+        <Col>
+          <h1>Registered Users</h1>
+        </Col>
+        <Col className="text-end">
+          <Button className="me-3" variant="success">
+            Filter
+          </Button>
+        </Col>
+      </Row>
+      {error ? (
         <MessageBox variant="danger">{error}</MessageBox>
       ) : (
         <>
-          <span>
-            <Button
-              type="button"
-              variant="danger"
-              onClick={() => {
-                var users1 = filterHandler();
-                // users = users1;
-              }}
-            >
-              filter
-            </Button>
-          </span>
+          <LoadingBox modal={loading}></LoadingBox>
           <table className="table">
             <thead>
               <tr>
@@ -96,73 +76,59 @@ function AdminUserList() {
               </tr>
             </thead>
             <tbody>
-              {users
-                // .filter((user, i) => {
-                //   return i <= 2;
-                // })
-                .map((user, i) => (
-                  <tr key={user._id}>
-                    <td>{i + 1}</td>
-                    <td>{user.firstName}</td>
-                    <td>{user.lastName}</td>
-                    <td>{user.email}</td>
+              {users.map((user, i) => (
+                <tr key={user._id}>
+                  <td>{i + 1}</td>
+                  <td>{user.firstName}</td>
+                  <td>{user.lastName}</td>
+                  <td>{user.email}</td>
+                  <td>
+                    {user.study_field ? user.study_field.field : 'Others'}
+                  </td>
+
+                  {new Date().getMonth() + 1 <=
+                    user.createdAt.substring(5, 7) &&
+                  user.createdAt.substring(8, 10) <= new Date().getDate() ? (
                     <td>
-                      {user.study_field ? user.study_field.field : 'Others'}
-                    </td>
-                    {console.log(
-                      new Date().getMonth() + 1,
-                      user.createdAt.substring(5, 7)
-                    )}
-                    {new Date().getMonth() + 1 <=
-                      user.createdAt.substring(5, 7) &&
-                    user.createdAt.substring(8, 10) < new Date().getDate() ? (
-                      <td>
-                        <Button variant="success" disabled>
-                          {user.createdAt.substring(0, 10)}
-                        </Button>
-                      </td>
-                    ) : (
-                      <td>
-                        <Button variant="danger" disabled>
-                          {user.createdAt.substring(0, 10)}
-                        </Button>
-                      </td>
-                    )}
-                    <td>{user.createdAt.substring(0, 10)}</td>
-                    <td>
-                      {' '}
-                      <Button
-                        type="button"
-                        variant="warning"
-                        onClick={() => {
-                          navigate(`/edit_user/${user._id}`);
-                        }}
-                      >
-                        edit
+                      <Button variant="success" disabled>
+                        {user.createdAt.substring(0, 10)}
                       </Button>
                     </td>
+                  ) : (
                     <td>
-                      {' '}
-                      <Button type="button" variant="danger">
-                        delete
+                      <Button variant="danger" disabled>
+                        {user.createdAt.substring(0, 10)}
                       </Button>
                     </td>
-                  </tr>
-                ))}
+                  )}
+                  <td>{user.createdAt.substring(0, 10)}</td>
+                  <td>
+                    {' '}
+                    <Button
+                      type="button"
+                      variant="warning"
+                      onClick={() => {
+                        setUser(user);
+                        toggle();
+                      }}
+                    >
+                      edit
+                    </Button>
+                  </td>
+                  <td>
+                    {' '}
+                    <Button type="button" variant="danger">
+                      delete
+                    </Button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </>
       )}
       <div>
-        <DatePicker
-          selected={selectedDate}
-          onChange={(date) => setSelectedDate(date)}
-          minDate={new Date()}
-          filterDate={(date) => date.getDay() !== 6 && date.getDay() !== 0}
-          placeholderText="date"
-          // showYearDropdown
-          // scrollableMonthYearDropdown
-        />
+        <UserEditToggle modal={modal} toggle={toggle} user={user} />
       </div>
     </>
   );

@@ -11,9 +11,9 @@ import SubscriptionScreen from './Screens/SubscriptionScreen';
 import ChatBox from './Components/ChatBox';
 // import RegistrationScreen from './Screens/RegistrationScreen';
 import AdminChatScreen from './Screens/AdminChatScreen';
-import TodolistScreen from './Screens/TodolistScreen';
 import AdminDashboardScree from './Screens/AdminDashboardScree';
 import AdminUserList from './Screens/AdminUserList';
+import TodolistScreen from './Screens/todolist/TodolistScreen';
 function App() {
   return (
     <BrowserRouter>

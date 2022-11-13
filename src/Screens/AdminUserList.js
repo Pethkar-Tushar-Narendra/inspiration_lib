@@ -2,64 +2,125 @@ import React, { useEffect, useReducer, useState } from 'react';
 import axios from 'axios';
 import LoadingBox from '../Components/LoadingBox';
 import MessageBox from '../Components/MessageBox';
-import { Button } from 'react-bootstrap';
-import { Col, Row } from 'reactstrap';
+import { Button, Form } from 'react-bootstrap';
+import { Col, Input, Row } from 'reactstrap';
 import UserEditToggle from '../Components/models/UserEditToggle';
 
-const reducer = (state, action) => {
-  switch (action.type) {
-    case 'Request_fetch':
-      return { ...state, loading: true };
-    case 'Fetch_fail': {
-      return { ...state, loading: false, error: action.payload };
-    }
-    case 'Fetch_success': {
-      const { registered_users } = action.payload;
-      return { ...state, loading: false, users: registered_users };
-    }
-    default:
-      return state;
-  }
-};
-
 function AdminUserList() {
-  const [{ loading, error, users }, dispatch] = useReducer(reducer, {
-    loading: true,
-    error: '',
-    users: [],
-  });
+  const [user, setUser] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [users1, setUsers1] = useState([]);
+  const [message, setMessage] = useState('');
+  const [messageTitle, setMessageTitle] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      dispatch({ type: 'Request_fetch' });
       try {
+        setLoading(true);
         const { data } = await axios.get('/api/registered_users');
-        dispatch({ type: 'Fetch_success', payload: data });
+        const { registered_users } = data;
+        setUsers(registered_users);
+        setUsers1(registered_users);
+        setLoading(false);
       } catch (err) {
-        dispatch({ type: 'Fetch_fail', payload: err.response.data.message });
+        setMessageTitle('Error...');
+        setMessage(err.response ? err.response.data.message : err.message);
+        setError(true);
       }
     };
     fetchData();
   }, []);
-  const [user, setUser] = useState([]);
   const [modal, setModal] = useState(false);
+  const [query, setQuery] = useState('');
   const toggle = () => setModal(!modal);
+  var array = [];
+  var array1 = [];
+  const submitHandler = (e) => {
+    e.preventDefault();
+    if (query.length < 1) {
+      setUsers(users1);
+    } else {
+      for (var i = 0; i < users.length; i++) {
+        if (
+          query.trim().length > users[i].lastName.length &&
+          query.trim().length > users[i].firstName.length
+        ) {
+          array1 = query.trim().toUpperCase().split(' ');
+          if (
+            users[i].firstName.toUpperCase() === array1[0] &&
+            users[i].lastName.toUpperCase() === array1[1]
+          ) {
+            array.push(users[i]);
+          }
+        } else if (
+          query.trim().length <= users[i].lastName.length ||
+          query.trim().length <= users[i].firstName.length
+        ) {
+          for (
+            var j = 0;
+            j <= users[i].firstName.length - query.trim().length;
+            j++
+          ) {
+            if (
+              users[i].firstName
+                .substr(j, query.trim().length)
+                .toUpperCase() === query.trim().toUpperCase() ||
+              users[i].lastName.substr(j, query.trim().length).toUpperCase() ===
+                query.trim().toUpperCase()
+            ) {
+              array.push(users[i]);
+            }
+          }
+        } else if (
+          query.trim().length === users[i].lastName.length ||
+          query.trim().length === users[i].firstName.length
+        ) {
+          if (
+            users[i].lastName.toUpperCase() === query.trim().toUpperCase() ||
+            users[i].firstName.toUpperCase() === query.trim().toUpperCase()
+          ) {
+            array.push(users[i]);
+          }
+        }
+        setUsers(array);
+        setQuery('');
+      }
+    }
+  };
   return (
     <>
-      <Row>
-        <Col>
-          <h1>Registered Users</h1>
-        </Col>
-        <Col className="text-end">
-          <Button className="me-3" variant="success">
-            Filter
-          </Button>
-        </Col>
-      </Row>
       {error ? (
         <MessageBox variant="danger">{error}</MessageBox>
       ) : (
         <>
+          <Row>
+            <Col>
+              <h1>Registered Users</h1>
+            </Col>
+            <Col className="text-end">
+              <Button className="me-2" variant="success">
+                filter
+              </Button>
+            </Col>
+            <Col className="text-end">
+              <Form className="d-flex" onSubmit={submitHandler}>
+                <Form.Control
+                  type="search"
+                  value={query}
+                  placeholder="Name"
+                  className="me-2"
+                  aria-label="Search"
+                  onChange={(e) => setQuery(e.target.value)}
+                  required
+                />
+                <Button className="me-2" variant="success" type="submit">
+                  Search
+                </Button>
+              </Form>
+            </Col>
+          </Row>
           <LoadingBox modal={loading}></LoadingBox>
           <table className="table">
             <thead>
@@ -88,7 +149,7 @@ function AdminUserList() {
 
                   {new Date().getMonth() + 1 <=
                     user.createdAt.substring(5, 7) &&
-                  user.createdAt.substring(8, 10) <= new Date().getDate() ? (
+                  new Date().getDate() <= user.createdAt.substring(8, 10) ? (
                     <td>
                       <Button variant="success" disabled>
                         {user.createdAt.substring(0, 10)}

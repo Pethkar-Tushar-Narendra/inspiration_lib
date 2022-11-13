@@ -7,14 +7,21 @@ import RegisterToggle from './models/RegisterToggle';
 import MessageToggle from './models/MessageToggle';
 import LogInToggle from './models/LogInToggle';
 import { Store } from '../Store';
+import ProfileUpdateToggle from './models/ProfileUpdateToggle';
+import SubEndDateToggle from './models/SubEndDateToggle';
 
 function Header() {
+  const navigate = useNavigate();
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { inspiration_userInfo } = state;
   const [modal, setModal] = useState(false);
   const [loginModal, setLoginModal] = useState(false);
+  const [profileModal, setProfileModal] = useState(false);
+  const [subEndModal, setSubEndModal] = useState(false);
   const toggle = () => setModal(!modal);
   const loginToggle = () => setLoginModal(!loginModal);
+  const profileToggle = () => setProfileModal(!profileModal);
+  const subEndToggle = () => setSubEndModal(!subEndModal);
   const changeForm = () => {
     setModal(!modal);
     setLoginModal(!loginModal);
@@ -23,6 +30,7 @@ function Header() {
   const signOutHandler = () => {
     ctxDispatch({ type: 'USER_SIGNOUT' });
     localStorage.removeItem('inspiration_userInfo');
+    navigate('/');
   };
   return (
     <>
@@ -60,13 +68,13 @@ function Header() {
               </Nav>
               {inspiration_userInfo && (
                 <NavDropdown title="Welcome" id="navbarScrollingDropdown">
-                  <LinkContainer to="/dashboard">
-                    <NavDropdown.Item>Profile</NavDropdown.Item>
-                  </LinkContainer>
+                  <NavDropdown.Item onClick={profileToggle}>
+                    Profile
+                  </NavDropdown.Item>
                   <NavDropdown.Divider />
-                  <LinkContainer to="/userlist">
-                    <NavDropdown.Item>Subscription</NavDropdown.Item>
-                  </LinkContainer>
+                  <NavDropdown.Item onClick={subEndToggle}>
+                    Subscription
+                  </NavDropdown.Item>
                 </NavDropdown>
               )}
               <Nav.Link disabled>
@@ -131,6 +139,8 @@ function Header() {
         toggle={loginToggle}
         changeForm={changeForm}
       />
+      <ProfileUpdateToggle modal={profileModal} toggle={profileToggle} />
+      <SubEndDateToggle modal={subEndModal} toggle={subEndToggle} />
     </>
   );
 }

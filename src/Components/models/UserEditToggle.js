@@ -91,8 +91,13 @@ const UserEditToggle = ({ modal, toggle, id, user }) => {
               <Form.Control value={user.email} disabled />
             </Form.Group>
             <Form.Group className="mb-3" controlId="email">
-              <Form.Label>Email</Form.Label>
-              <Form.Control value={user.study_field?.field} disabled />
+              <Form.Label>Study Feild</Form.Label>
+              <Form.Control
+                value={
+                  user.study_field != null ? user.study_field.field : 'Other'
+                }
+                disabled
+              />
             </Form.Group>
             <Button color="primary" type="submit">
               Update

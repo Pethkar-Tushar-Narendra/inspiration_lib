@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useReducer, useState } from 'react';
 import axios from 'axios';
 import LoadingBox from '../Components/LoadingBox';
 import MessageBox from '../Components/MessageBox';
@@ -8,38 +8,68 @@ import Chart from 'react-google-charts';
 import UserEditToggle from '../Components/models/UserEditToggle';
 import { Store } from '../Store';
 
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'FETCH_REQUEST':
+      return { ...state, loading: true };
+    case 'FETCH_SUCCESS':
+      return {
+        ...state,
+        summary: action.payload,
+        loading: false,
+      };
+    case 'FETCH_FAIL':
+      return { ...state, loading: false, error: action.payload };
+    default:
+      return state;
+  }
+};
 const AdminDashboardScree = () => {
   const { state } = useContext(Store);
   const { inspiration_userInfo } = state;
   const [users, setUsers] = useState([]);
   const [message, setMessage] = useState('');
   const [messageTitle, setMessageTitle] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const [pieArrayneed, setPieArrayNeed] = useState([]);
 
   const [categories, setCategories] = useState([]);
+  const [{ loading, summary, error }, dispatch] = useReducer(reducer, {
+    loading: true,
+    error: '',
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
         const { data } = await axios.get('/api/summary', {
           headers: { Authorization: `Bearer ${inspiration_userInfo.token}` },
         });
-        // setCategories(categories.data);
-        // const { registered_users } = data;
-        // setUsers(registered_users);
-        // setLoading(false);
-        // setPieArrayNeed(setPieArray());
+        dispatch({ type: 'FETCH_SUCCESS', payload: data });
+        console.log(data);
       } catch (err) {
-        setMessageTitle('Error...');
-        setMessage(err.response ? err.response.data.message : err.message);
-        setError(true);
+        dispatch({
+          type: 'FETCH_FAIL',
+          payload: err.response ? err.response.data.message : err.message,
+        });
       }
     };
     fetchData();
-  }, []);
+  }, [inspiration_userInfo]);
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const { data } = await axios.get('/api/summary', {
+  //         headers: { Authorization: `Bearer ${inspiration_userInfo.token}` },
+  //       });
+  //     } catch (err) {
+  //       setMessageTitle('Error...');
+  //       setMessage(err.response ? err.response.data.message : err.message);
+  //       setError(true);
+  //     }
+  //   };
+  //   fetchData();
+  // }, []);
   const [modal, setModal] = useState(false);
   const [query, setQuery] = useState('');
   const toggle = () => setModal(!modal);
@@ -55,35 +85,68 @@ const AdminDashboardScree = () => {
     return pieArray;
   };
   return (
-    <>
-      <>
-        <div>
-          <span>mesmbers ===</span>
-          {/* <span>{users.length}</span> */}
-          {/* {console.log(categories)} */}
-        </div>
-        {/* <Chart
-          width="100%"
-          height="400px"
-          chartType="AreaChart"
-          loader={<div>Loading Chart...</div>}
-          data={[
-            ['Date', 'Sales'],
-            // ...summary.dailyOrders.map((x) => [x._id, x.sales]),
-          ]}
-        ></Chart> */}
-        {/* <Chart
-          width="100%"
-          height="400px"
-          chartType="PieChart"
-          loader={<div>Loading Chart...</div>}
-          data={[
-            ['Category', 'Products'],
-            ...pieArrayneed.map((x) => [x[0], x[1]]),
-          ]}
-        ></Chart> */}
-      </>
-    </>
+    <div>
+      <h1>Dashboard</h1>
+      {loading ? (
+        <>Raj</>
+      ) : error ? (
+        <>Raj</>
+      ) : (
+        <>
+          <div className="my-3">
+            <h2>Admission Chart</h2>
+            {summary.dailyAdmissions.length === 0 ? (
+              <MessageBox>No Sale</MessageBox>
+            ) : (
+              <Chart
+                width="100%"
+                height="400px"
+                chartType="AreaChart"
+                loader={<div>Loading Chart...</div>}
+                data={[
+                  ['Date', 'Sales'],
+                  ...summary.dailyAdmissions.map((x) => [x._id, x.admissions]),
+                ]}
+              ></Chart>
+            )}
+          </div>
+          <div className="my-3">
+            <h2>Subscription over chart</h2>
+            {summary.dailySubOver.length === 0 ? (
+              <MessageBox>No Sale</MessageBox>
+            ) : (
+              <Chart
+                width="100%"
+                height="400px"
+                chartType="AreaChart"
+                loader={<div>Loading Chart...</div>}
+                data={[
+                  ['Date', 'Sales'],
+                  ...summary.dailySubOver.map((x) => [x._id, x.admissions]),
+                ]}
+              ></Chart>
+            )}
+          </div>{' '}
+          <div className="my-3">
+            <h2>Categories</h2>
+            {summary.studyCategories.length === 0 ? (
+              <MessageBox>No Category</MessageBox>
+            ) : (
+              <Chart
+                width="100%"
+                height="400px"
+                chartType="PieChart"
+                loader={<div>Loading Chart...</div>}
+                data={[
+                  ['Category', 'Products'],
+                  ...summary.studyCategories.map((x) => [x._id, x.count]),
+                ]}
+              ></Chart>
+            )}
+          </div>
+        </>
+      )}
+    </div>
   );
 };
 

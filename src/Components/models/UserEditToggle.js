@@ -11,8 +11,10 @@ import 'react-datepicker/dist/react-datepicker.css';
 const UserEditToggle = ({ modal, toggle, id, user }) => {
   const { state } = useContext(Store);
   const { inspiration_userInfo } = state;
-  const [admission_date, setAdmission_date] = useState(null);
-  const [subscription_end_date, setSubscription_end_date] = useState(null);
+  const [admission_date, setAdmission_date] = useState(user.admission_date);
+  const [subscription_end_date, setSubscription_end_date] = useState(
+    user.subscription_end_date
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [message, setMessage] = useState('');
@@ -54,8 +56,8 @@ const UserEditToggle = ({ modal, toggle, id, user }) => {
             <DatePicker
               selected={subscription_end_date}
               onChange={(date) => setSubscription_end_date(date)}
-              minDate={new Date()}
-              filterDate={(date) => date.getDay() !== 6 && date.getDay() !== 0}
+              // minDate={new Date()}
+              // filterDate={(date) => date.getDay() !== 6 && date.getDay() !== 0}
               placeholderText="Subscription Date"
               // showYearDropdown
               // scrollableMonthYearDropdown
@@ -66,8 +68,8 @@ const UserEditToggle = ({ modal, toggle, id, user }) => {
             <DatePicker
               selected={admission_date}
               onChange={(date) => setAdmission_date(date)}
-              minDate={new Date()}
-              filterDate={(date) => date.getDay() !== 6 && date.getDay() !== 0}
+              // minDate={new Date()}
+              // filterDate={(date) => date.getDay() !== 6 && date.getDay() !== 0}
               placeholderText="Admission Date"
               // showYearDropdown
               // scrollableMonthYearDropdown

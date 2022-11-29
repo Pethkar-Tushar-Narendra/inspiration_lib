@@ -89,6 +89,7 @@ function AdminUserList() {
       }
     }
   };
+  var num;
   return (
     <>
       {error ? (
@@ -147,22 +148,36 @@ function AdminUserList() {
                     {user.study_field ? user.study_field.field : 'Others'}
                   </td>
 
-                  {new Date().getMonth() + 1 <=
-                    user.createdAt.substring(5, 7) &&
-                  new Date().getDate() <= user.createdAt.substring(8, 10) ? (
-                    <td>
-                      <Button variant="success" disabled>
-                        {user.createdAt.substring(0, 10)}
-                      </Button>
-                    </td>
-                  ) : (
-                    <td>
-                      <Button variant="danger" disabled>
-                        {user.createdAt.substring(0, 10)}
-                      </Button>
-                    </td>
-                  )}
-                  <td>{user.createdAt.substring(0, 10)}</td>
+                  {
+                    (num =
+                      Number(
+                        String(new Date().getFullYear()) +
+                          String(new Date().getMonth() + 1) +
+                          String(new Date().getDate())
+                      ) <=
+                      Number(
+                        String(user.subscription_end_date.substring(0, 4)) +
+                          String(user.subscription_end_date.substring(5, 7)) +
+                          String(user.subscription_end_date.substring(8, 10))
+                      ) ? (
+                        <td>
+                          <Button variant="success" disabled>
+                            {user.subscription_end_date.substring(0, 10)}
+                          </Button>
+                        </td>
+                      ) : (
+                        <td>
+                          <Button variant="danger" disabled>
+                            {user.subscription_end_date.substring(0, 10)}
+                          </Button>
+                        </td>
+                      ))
+                  }
+                  <td>
+                    {user.admission_date != null
+                      ? user.admission_date.substring(0, 10)
+                      : user.createdAt.substring(0, 10)}
+                  </td>
                   <td>
                     {' '}
                     <Button
